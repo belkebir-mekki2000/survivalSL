@@ -11,7 +11,12 @@ predict.sltime <-function(object, newdata=NULL, newtimes=NULL, ...){
     Fit[[M+1]]<-object$predictions[,-1]
     time.pred<-object$times[-1]
   }else {
-    time.pred<-newtimes
+    
+    newtimes<-sort(newtimes)
+    
+    if(! is.null(newtimes)) {time.pred <- newtimes}
+    
+    if(!is.null(newtimes) & 0 %in% newtimes) {time.pred <- newtimes[which(newtimes!=0)]}
 
     if(is.null(newtimes)) {time.pred <- object$times[-1]}
 
@@ -23,6 +28,14 @@ predict.sltime <-function(object, newdata=NULL, newtimes=NULL, ...){
 
     weighted_matrices <- mapply(function(mat, weight) mat * weight, Fit[-(M+1)], w.sl, SIMPLIFY = FALSE)
     Fit[[M+1]] <- Reduce("+", weighted_matrices)
+    
+    if(!is.null(newtimes) & 0 %in% newtimes) {
+      Fit<-lapply(Fit, function(mat){
+        mat=cbind(rep(1,nrow(mat)),mat)
+        return(mat)
+      })
+    }
+    
 
 
 
