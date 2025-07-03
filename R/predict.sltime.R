@@ -50,6 +50,3 @@ predict.sltime <-function(object, newdata=NULL, newtimes=NULL, ...){
   return(list(predictions=Fit,
               times=time.pred))
 }
-
-
-
