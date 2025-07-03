@@ -1,7 +1,7 @@
 survivalSL: an R Package for Predicting Survival by a Super Learner
 ================
 
-## Description
+## Descriptio
 
 The R package ‘survivalSL’ contains a variety of functions to construct
 a super learner in the presence of censored times-to-event and to
