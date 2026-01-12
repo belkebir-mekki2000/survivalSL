@@ -192,7 +192,11 @@ tunePLANN <- function(formula, data, cv=10, inter=1, size=c(2, 4, 6, 8, 10), dec
 
     .plann <- sPLANN(formula=.formula, data=cbind(data_bis,model_matrix), inter=y$inter, size = y$size, decay = y$decay,  maxit = y$maxit, MaxNWts = y$MaxNWts, pro.time=maxtime)
 
-    newdata <- model.matrix(formula, rbind(x$valid,x$train))[1:nrow(x$valid),]
+    newdata <- model.matrix(.formula, rbind(x$valid, x$train))[
+      1:nrow(x$valid),
+      ,
+      drop = FALSE
+    ]
     .survivals <- predict(.plann, newdata = data.frame(newdata), newtimes = .time)$predictions
     return(predictions=list(survivals=.survivals, id=x$valid$id))
 
