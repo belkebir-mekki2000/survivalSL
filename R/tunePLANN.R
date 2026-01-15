@@ -113,9 +113,7 @@ tunePLANN <- function(formula, data, cv=10, inter=1, size=c(2, 4, 6, 8, 10), dec
   .data_bis<-data
   .time <-unique(sort(c(0,pro.time,data[[times]])))
 
-  if (is.null(maxtime) || maxtime < max(.time)) {
-    maxtime <- max(.time) + 1
-  }
+
 
 
 
@@ -127,10 +125,20 @@ tunePLANN <- function(formula, data, cv=10, inter=1, size=c(2, 4, 6, 8, 10), dec
   data$id<-1:nrow(data)
 
   CVtune <- lapply(1:cv, function(i) {
+
+    # create train and valid
+    train <- data[data$folds != i, ]
+    valid <- data[data$folds == i, ]
+
+    # calculate t_max_fold
+    t_max_fold <- max(train[train[[failures]] == 1, times])
+
     list(
-      train = data[data$folds != i, ],
-      valid = data[data$folds == i, ]
-    )})
+      train = train,
+      valid = valid,
+      t_max_fold = t_max_fold
+    )
+  })
 
 
 
@@ -161,7 +169,8 @@ tunePLANN <- function(formula, data, cv=10, inter=1, size=c(2, 4, 6, 8, 10), dec
       CVtune <- lapply(1:cv, function(i) {
         list(
           train = data[data$folds != i, ],
-          valid = data[data$folds == i, ]
+          valid = data[data$folds == i, ],
+          t_max_fold <- max(train[train[["status"]] == 1, "time"])
         )})
 
       if(i>=3 & check_CVtune(factor_vars,CVtune)==FALSE)stop("Certain levels of some factor variables in the validation sample are not present in the training sample. Please change the seed.")
@@ -170,6 +179,15 @@ tunePLANN <- function(formula, data, cv=10, inter=1, size=c(2, 4, 6, 8, 10), dec
 
 
   }
+
+
+  t_max_global <- min(unlist(lapply(CVtune,function(x)(return(x$t_max_fold)))))
+  .time <- .time[.time <= t_max_global]
+  if (is.null(maxtime) || maxtime < max(.time)) {
+    maxtime <- max(.time) + 1
+  }
+
+
 
 
 

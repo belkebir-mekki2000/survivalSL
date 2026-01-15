@@ -66,10 +66,10 @@ survivalSL <- function(formula, data, methods, metric="auc", penalty=NULL,
 
 
   }
-  
-  
- 
-  
+
+
+
+
 
   variables_formula <- all.vars(formula)
 
@@ -106,13 +106,13 @@ survivalSL <- function(formula, data, methods, metric="auc", penalty=NULL,
     data<-cbind(subset_data, data[!colnames(data) %in% colnames(subset_data), drop = FALSE])
     warning("Data need to be without NA. NA is removed")
   }
-  
-  
+
+
   if(!(is.null(penalty))){
-    
+
     if(length(penalty)!=length(variables_formula[-c(1,2)]))stop("Penalty length does not equal the number of variables.")
     if(!all(unique(penalty) %in% c(0,1)))stop("Penalty must be numeric and have only 0 or 1.")}
-  
+
 
 
   #####################
@@ -903,12 +903,24 @@ survivalSL <- function(formula, data, methods, metric="auc", penalty=NULL,
 
 
   CVtune <- lapply(1:cv, function(i) {
-    if(show_progress){ update_progress()}
+
+    if(show_progress){ update_progress() }
+
+
+    train <- data[data$folds != i, ]
+    valid <- data[data$folds == i, ]
+
+
+    t_max_fold <- max(train[train[[failures]] == 1, times])
+
+    # Renvoyer la liste
     list(
-      train = data[data$folds != i, ],
-      valid = data[data$folds == i, ],
-      id=data[data$folds == i, "id"]
-    )})
+      train = train,
+      valid = valid,
+      id = valid[["id"]],
+      t_max_fold = t_max_fold
+    )
+  })
 
 
 
@@ -937,7 +949,8 @@ survivalSL <- function(formula, data, methods, metric="auc", penalty=NULL,
         list(
           train = data[data$folds != i, ],
           valid = data[data$folds == i, ],
-          id=data[data$folds == i, "id"]
+          id=data[data$folds == i, "id"],
+          t_max_fold <- max(train[train[["status"]] == 1, "time"])
         )})
 
 
@@ -952,6 +965,11 @@ survivalSL <- function(formula, data, methods, metric="auc", penalty=NULL,
 
 
   id_vect<- unlist(lapply(CVtune,function(x)(return(x$id))))
+
+  if (any(methods %in% c("LIB_COXlasso","LIB_COXen","LIB_COXridge","LIB_COXall","LIB_COXaic","LIB_RSF","LIB_PLANN"))) {
+    t_max_global <- min(unlist(lapply(CVtune, function(x) x$t_max_fold)))
+    time.pred <- time.pred[time.pred <= t_max_global]
+  }
 
 
 
