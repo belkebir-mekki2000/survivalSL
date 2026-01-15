@@ -67,7 +67,7 @@ predict.libsl <- function(object, newdata=NULL, newtimes=NULL, ...){
       .time<-newtimes
       .idx<-findInterval(.time,.times)
 
-      # Interdire l'extrapolation
+      # Extrapolation no allowed
       .idx[.time > max(.times)] <- NA
       .survivals<-.surv[,.idx]
 
