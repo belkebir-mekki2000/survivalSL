@@ -34,35 +34,50 @@ survivalSL <- function(formula, data, methods, metric="auc", penalty=NULL,
 
 
   if(metric=="ll"){
-    haz_function<-function(surv,times){
-      x<-1
-      result<-sapply(2:length(surv),function(i){
-        value<-surv[i]
-        if(value!=surv[i-1]){
-          x<<- x+1
+    haz_function <- function(surv, times) {
+      x <- 1
+      result <- sapply(2:length(surv), function(i) {
+        value <- surv[i]
+        if(value != surv[i-1]) {
+          x <<- x + 1
         }
         return(x)
       })
 
-
-      df<-data.frame(temps=times,value=-log(surv),result=c(1,result))
+      df <- data.frame(temps = times, value = -log(surv), result = c(1, result))
       df_unique <- df[!duplicated(df$result), ]
-      if(nrow(df_unique)>1){
-        diff_1<-diff(df_unique$temps)
-        diff_2 <- diff(df_unique$value)
-        resultat <- diff_2/diff_1
-        resultat<-c(Inf,resultat,NA)
-        idx=findInterval(times,c(0,df_unique$temps))
-        bj<-c(Inf,resultat[idx])
-      }
-      else{
-        bj<-c(rep(Inf,(length(surv)-1)),NA)
-      }
 
+      if(nrow(df_unique) > 1) {
+        # Calcul des taux de hasard pour chaque intervalle
+        diff_1 <- diff(df_unique$temps)
+        diff_2 <- diff(df_unique$value)
+        taux_intervalles <- diff_2 / diff_1
+
+        # Création d'un vecteur de résultats de la bonne longueur
+        bj <- rep(NA, length(times))
+
+        # Le premier temps (temps 0) reçoit Inf
+        bj[1] <- Inf
+
+        # Pour chaque temps intermédiaire, assigner le taux correspondant
+        for(i in 2:(length(times)-1)) {
+          # Trouver à quel intervalle appartient ce temps
+          idx_interval <- findInterval(times[i], df_unique$temps)
+          if(idx_interval > 0 && idx_interval <= length(taux_intervalles)) {
+            bj[i] <- taux_intervalles[idx_interval]
+          }
+        }
+        # Le dernier temps reste NA (c'est fait par l'initialisation)
+
+      } else {
+        # Pas de changements : Inf au temps 0, NA ailleurs
+        bj <- c(Inf, rep(NA, length(times) - 1))
+      }
 
       return(bj)
-
     }
+
+  }
 
 
   }
