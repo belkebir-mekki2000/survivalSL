@@ -55,7 +55,7 @@ metrics <- function(metric, formula=NULL, data=NULL, survivals.matrix=NULL, haza
          Uno concordance index (uno_ci),
          integrated Brier score (ibs), the binomial log-likelihood (bll),
          the integrated binomial log-likelihood (ibll), the restricted ibs (ribs),
-         the restricted ibll (ribll), the log-likelihood (loglik),
+         the restricted ibll (ribll),
          the area under the ROC curve (auc), or the log-likelihood (ll)")
   }
 
