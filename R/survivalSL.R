@@ -591,6 +591,7 @@ survivalSL <- function(formula, data, methods, metric="auc", penalty=NULL,
   }
 
   time.pred <- unique(sort(c(0,pro.time,data[[times]])))
+  time.pred_bis <- unique(sort(c(0,pro.time,data[[times]])))
 
   if("LIB_PLANN" %in% methods){
     maxtime=max(time.pred)+1
@@ -1196,7 +1197,7 @@ survivalSL <- function(formula, data, methods, metric="auc", penalty=NULL,
 
   for(me in 1:M){
     if(show_progress){ update_progress()}
-    FitALL[[me]]<-predict(object= .model[[me]],newtimes=time.pred)$predictions
+    FitALL[[me]]<-predict(object= .model[[me]],newtimes=time.pred_bis)$predictions
   }
 
   weighted_matrices <- mapply(function(mat, weight) mat * weight, FitALL, w.sl, SIMPLIFY = FALSE)
@@ -1217,7 +1218,7 @@ survivalSL <- function(formula, data, methods, metric="auc", penalty=NULL,
 
   data<-.data_bis
 
-  res<-list(times=time.pred,
+  res<-list(times=time.pred_bis,
             predictions=survivals,
             FitALL=FitALL,
             data=data,
