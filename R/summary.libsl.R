@@ -75,8 +75,8 @@ summary.libsl <- function(object, newdata=NULL, ROC.precision=seq(.01,.99,.01), 
 
     }
 
-    return(
-      list(metrics=round(  data.frame(
+    
+      out<-list(metrics=round(  data.frame(
         p_ci = metrics(metric="p_ci", formula=object$formula, data=object$data, survivals.matrix=survivals.matrix,
                        hazards.matrix=NULL,prediction.times=time.pred,pro.time=pro.time, ROC.precision=ROC.precision),
         uno_ci = metrics(metric="uno_ci", formula=object$formula, data=object$data, survivals.matrix=survivals.matrix,
@@ -99,7 +99,7 @@ summary.libsl <- function(object, newdata=NULL, ROC.precision=seq(.01,.99,.01), 
                     hazards.matrix=hazards.matrix,prediction.times=time.pred,pro.time=pro.time, ROC.precision=ROC.precision)), digits = digits ),
         library=object$library,
         pro.time=pro.time,
-        ROC.precision=ROC.precision) )
+        ROC.precision=ROC.precision) 
   }else {
 
     survivals.matrix <- predict(object, newdata=newdata, newtimes=time.pred)$predictions
@@ -119,8 +119,7 @@ summary.libsl <- function(object, newdata=NULL, ROC.precision=seq(.01,.99,.01), 
 
     }
 
-    return(
-      list(metrics=round(  data.frame(
+      out<-list(metrics=round(  data.frame(
         p_ci = metrics(metric="p_ci", formula=object$formula, data=newdata, survivals.matrix=survivals.matrix,
                        hazards.matrix=NULL,prediction.times=time.pred,pro.time=pro.time, ROC.precision=ROC.precision),
         uno_ci = metrics(metric="uno_ci", formula=object$formula, data=newdata, survivals.matrix=survivals.matrix,
@@ -143,12 +142,16 @@ summary.libsl <- function(object, newdata=NULL, ROC.precision=seq(.01,.99,.01), 
                     hazards.matrix=hazards.matrix,prediction.times=time.pred,pro.time=pro.time, ROC.precision=ROC.precision)), digits = digits ) ,
         library=object$library,
         pro.time=pro.time,
-        ROC.precision=ROC.precision))
+        ROC.precision=ROC.precision)
 
 
 
 
   }
+  
+  class(out)<-"summary.libsl"
+  out
+  
 }
 
 

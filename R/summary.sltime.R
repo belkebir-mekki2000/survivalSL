@@ -78,8 +78,8 @@ summary.sltime <- function(object, newdata=NULL, method="sl",
       hazards.matrix<-t(apply(survivals.matrix,1,haz_function,times=time.pred))
       }
 
-    return(
-      list(metrics=round(  data.frame(
+    
+      out<-list(metrics=round(  data.frame(
         p_ci = metrics(metric="p_ci", formula=object$formula, data=object$data, survivals.matrix=survivals.matrix,
                        hazards.matrix=NULL,prediction.times=time.pred,pro.time=pro.time, ROC.precision=ROC.precision),
         uno_ci = metrics(metric="uno_ci", formula=object$formula, data=object$data, survivals.matrix=survivals.matrix,
@@ -102,13 +102,12 @@ summary.sltime <- function(object, newdata=NULL, method="sl",
                     hazards.matrix=hazards.matrix,prediction.times=time.pred,pro.time=pro.time, ROC.precision=ROC.precision)), digits = digits ),
         method=method,
         pro.time=pro.time,
-        ROC.precision=ROC.precision) )
+        ROC.precision=ROC.precision) 
 
 
 
 
   }else{
-
 
     survivals.matrix <- predict(object, newdata=newdata, newtimes=time.pred)$predictions[[method]]
 
@@ -128,8 +127,7 @@ summary.sltime <- function(object, newdata=NULL, method="sl",
     }
 
 
-    return(
-      list(metrics=round(  data.frame(
+      out<-list(metrics=round(  data.frame(
         p_ci = metrics(metric="p_ci",formula=object$formula , data=newdata, survivals.matrix=survivals.matrix,
                        hazards.matrix=NULL,prediction.times=time.pred,pro.time=pro.time, ROC.precision=ROC.precision),
         uno_ci = metrics(metric="uno_ci", formula=object$formula, data=newdata, survivals.matrix=survivals.matrix,
@@ -152,12 +150,15 @@ summary.sltime <- function(object, newdata=NULL, method="sl",
                     hazards.matrix=hazards.matrix,prediction.times=time.pred,pro.time=pro.time, ROC.precision=ROC.precision)), digits = digits ),
         method=method,
         pro.time=pro.time,
-        ROC.precision=ROC.precision) )
+        ROC.precision=ROC.precision) 
 
 
 
 
   }
+  
+  class(out)<-"summary.sltime"
+  out
 
 
 
