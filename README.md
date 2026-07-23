@@ -61,12 +61,12 @@ slres <- survivalSL(formula=formula,
 # prognostic capacities from training sample
 summary(slres, digits=3) 
 #>     p_ci  uno_ci   auc   bs   ibs  ribs   bll  ibll ribll        ll
-#>     0.677  0.676 0.717 0.202 0.103 0.095 0.594 0.325 0.314 -1079.121
+#>     0.677  0.677 0.719 0.202 0.09 0.095 0.594 0.286 0.314 -1084.344
 
 # prognostic capacities from validation sample
 summary(slres, newdata=data.simul[[2]], digits=3) 
 #>  p_ci uno_ci   auc    bs   ibs  ribs   bll  ibll ribll       ll
-#>  0.725  0.728 0.786 0.183 0.097 0.086 0.547 0.312  0.29 -476.942
+#>  0.725  0.728 0.786 0.183 0.085 0.087 0.547 0.274  0.29 -476.942
 ```
 
 ## Installation
