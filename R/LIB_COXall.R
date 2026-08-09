@@ -53,7 +53,7 @@ LIB_COXall<- function(formula, data){
   .coxphsurv<-survfit(.coxph, newdata = data,se.fit = F)
 
 
-  .sumcoxphsurv<-summary(.coxphsurv, times=sort(unique(data[[times]])))
+  .sumcoxphsurv<-summary(.coxphsurv, times=sort(.coxphsurv$time))
   .pred <- t(.sumcoxphsurv$surv)
   .survivals<-cbind(rep(1, dim(.pred)[1]), .pred)
 
@@ -62,7 +62,7 @@ LIB_COXall<- function(formula, data){
                library="LIB_COXall",
                formula=formula,
                data=data,
-               times=c(0,sort(unique(data[[times]]))),predictions=.survivals )
+               times=c(0,sort(.coxphsurv$time)),predictions=.survivals )
 
   class(.obj) <- "libsl"
 

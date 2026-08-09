@@ -65,9 +65,7 @@ LIB_COXen <- function(formula,
                   cox.ties = "breslow",
                   alpha = alpha,penalty.factor = penalty)
 
-  }
-
-  else {
+  }else {
     .en<- glmnet(x = .x, y = .y, lambda = lambda,
                  type.measure = "deviance", family = "cox", cox.ties = "breslow",
                  alpha = alpha)
@@ -76,24 +74,29 @@ LIB_COXen <- function(formula,
 
 
   .lp.en <-predict(.en, newx = .x)
-
   .b <- glmnet_basesurv(data[[times]], data[[failures]], .lp.en, centered = FALSE)
   .H0 <- data.frame(value = .b$cumulative_base_hazard, time = .b$times)
 
+  # --- Seuil strict : dernier temps d'événement réel ---
+  max_event_time <- max(data[[times]][data[[failures]] == 1])
 
-  .pred <- exp(matrix(exp(.lp.en)) %*% t(as.matrix(-1*.H0$value)))  # It's just the survival formula based on the linear predictor
-  #...
-  .survivals<-cbind(rep(1, dim(.pred)[1]), .pred)
+  # On retire complètement les lignes au-delà de ce seuil
+  .H0 <- .H0[.H0$time <= max_event_time, ]
 
-  .obj <- list(model=.en,
-               library="LIB_COXen",
-               formula=formula,
-               data=data,
-               times=c(0,.H0$time),predictions=.survivals)
+  .pred <- exp(matrix(exp(.lp.en)) %*% t(as.matrix(-1 * .H0$value)))
+  .survivals <- cbind(rep(1, dim(.pred)[1]), .pred)
+
+  .obj <- list(model = .en,
+               library = "LIB_COXen",
+               formula = formula,
+               data = data,
+               times = c(0, .H0$time),
+               predictions = .survivals)
 
   class(.obj) <- "libsl"
-
   return(.obj)
+
+
 }
 
 

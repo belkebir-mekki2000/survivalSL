@@ -64,9 +64,7 @@ LIB_COXlasso <- function(formula,
                      type.measure = "deviance", family = "cox",cox.ties = "breslow",
                      alpha = 1,penalty.factor = penalty)
 
-  }
-
-  else{
+  }else{
     .lasso <- glmnet(x = .x, y = .y, lambda = lambda, type.measure = "deviance",
                      family = "cox",cox.ties = "breslow", alpha = 1)
   }
@@ -79,19 +77,23 @@ LIB_COXlasso <- function(formula,
   .b <- glmnet_basesurv(data[[times]], data[[failures]], .lp.lasso, centered = FALSE)
   .H0 <- data.frame(value = .b$cumulative_base_hazard, time = .b$times)
 
+  # --- Seuil strict : dernier temps d'événement réel ---
+  max_event_time <- max(data[[times]][data[[failures]] == 1])
 
-  .pred <- exp(matrix(exp(.lp.lasso)) %*% t(as.matrix(-1*.H0$value)))
+  # On retire complètement les lignes au-delà de ce seuil
+  .H0 <- .H0[.H0$time <= max_event_time, ]
 
-  .survivals<-cbind(rep(1, dim(.pred)[1]), .pred)
+  .pred <- exp(matrix(exp(.lp.lasso)) %*% t(as.matrix(-1 * .H0$value)))
+  .survivals <- cbind(rep(1, dim(.pred)[1]), .pred)
 
-  .obj <- list(model=.lasso,
-               library="LIB_COXlasso",
-               formula=formula,
-               data=data,
-               times=c(0,.H0$time),predictions=.survivals)
+  .obj <- list(model = .en,
+               library = "LIB_COXlasso",
+               formula = formula,
+               data = data,
+               times = c(0, .H0$time),
+               predictions = .survivals)
 
   class(.obj) <- "libsl"
-
   return(.obj)
 }
 

@@ -69,18 +69,23 @@ LIB_COXridge <- function(formula,
   .b <- glmnet_basesurv(data[[times]], data[[failures]], .lp.ridge, centered = FALSE)
   .H0 <- data.frame(value = .b$cumulative_base_hazard, time = .b$times)
 
-  .pred <- exp(matrix(exp(.lp.ridge)) %*% t(as.matrix(-1*.H0$value)))
+  # --- Seuil strict : dernier temps d'événement réel ---
+  max_event_time <- max(data[[times]][data[[failures]] == 1])
 
-  .survivals<-cbind(rep(1, dim(.pred)[1]), .pred)
+  # On retire complètement les lignes au-delà de ce seuil
+  .H0 <- .H0[.H0$time <= max_event_time, ]
 
-  .obj <- list(model=.ridge,
-               library="LIB_COXridge",
-               formula=formula,
-               data=data,
-               times=c(0,.H0$time),predictions=.survivals)
+  .pred <- exp(matrix(exp(.lp.ridge)) %*% t(as.matrix(-1 * .H0$value)))
+  .survivals <- cbind(rep(1, dim(.pred)[1]), .pred)
+
+  .obj <- list(model = .en,
+               library = "LIB_COXridge",
+               formula = formula,
+               data = data,
+               times = c(0, .H0$time),
+               predictions = .survivals)
 
   class(.obj) <- "libsl"
-
   return(.obj)
 }
 

@@ -67,23 +67,17 @@ LIB_RSF <- function(formula,
   options(rf.cores=1, mc.cores=1)
   .rf <- rfsrc(formula, data = data, nodesize = nodesize, mtry = mtry, ntree = ntree, splitrule="logrank",seed=-seed)
 
-  .time <- sort(unique(data[[times]]))
-
   .pred.rf <- predict(.rf,)
   .survival <- cbind(rep(1, dim(.pred.rf$survival.oob)[1]), .pred.rf$survival.oob) # We add a 1 because the function is step-like, so it's possible that an element
   #of .time is between 0 and x (time of the first event), and in that case, we assign it a survival of 1.
   .time.interest <- c(0, .pred.rf$time.interest)
-
-  .idx=findInterval(.time,.time.interest)
-  # indInterval: it returns which interval the values of .time belong to within .time.interest.
-  .pred=cbind(rep(1, dim(.survival[,.idx])[1]),.survival[,.idx] )
 
 
   .obj <- list(model=.rf,
                library="LIB_RSF",
                formula=formula,
                data=data,
-               times=c(0,.time),predictions=.pred)
+               times=.time.interest,predictions=.survival)
 
   class(.obj) <- "libsl"
 
